@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Time Together</title>
+  <link rel="stylesheet" href="counter.css" />
+</head>
+<body>
+
+  <!-- Galaxy Intro -->
+  <div id="galaxy-intro">
+    <canvas id="galaxy-canvas"></canvas>
+    <div class="galaxy-text">Love You Malak ❤️</div>
+  </div>
+
+  <!-- Counter Page -->
+  <div class="container" id="main-content" style="display:none;">
+    <div class="heart">❤️</div>
+    <h1>Together Since</h1>
+    <p class="date">August 15, 2022</p>
+
+    <div class="counter-grid">
+      <div class="box">
+        <span id="years">0</span>
+        <label>Years</label>
+      </div>
+      <div class="box">
+        <span id="months">0</span>
+        <label>Months</label>
+      </div>
+      <div class="box">
+        <span id="days">0</span>
+        <label>Days</label>
+      </div>
+      <div class="box">
+        <span id="hours">0</span>
+        <label>Hours</label>
+      </div>
+      <div class="box">
+        <span id="minutes">0</span>
+        <label>Minutes</label>
+      </div>
+      <div class="box">
+        <span id="seconds">0</span>
+        <label>Seconds</label>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <a href="gallery.html" class="btn">💕 Gallery</a>
+      <a href="index.html" class="btn btn-out">Logout</a>
+    </div>
+  </div>
+
+  <script src="counter.js"></script>
+  <script>
+    const canvas = document.getElementById("galaxy-canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    // نجوم الخلفية
+    const bgStars = Array.from({ length: 250 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      o: Math.random() * 0.8 + 0.2
+    }));
+
+    // حلقات الكوكب
+    const rings = [
+      { radiusX: 160, radiusY: 28, width: 18, alpha: 0.5 },
+      { radiusX: 195, radiusY: 34, width: 10, alpha: 0.35 },
+      { radiusX: 225, radiusY: 40, width: 6,  alpha: 0.2  }
+    ];
+
+    let angle = 0;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // خلفية سوداء
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // نجوم
+      bgStars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,220,220,${s.o})`;
+        ctx.fill();
+      });
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      // الجزء الخلفي من الحلقات (وراء الكوكب)
+      rings.forEach(ring => {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ring.radiusX, ring.radiusY, 0, Math.PI, Math.PI * 2);
+        ctx.strokeStyle = `rgba(220,80,60,${ring.alpha})`;
+        ctx.lineWidth = ring.width;
+        ctx.stroke();
+      });
+
+      // الكوكب
+      const planetR = 100;
+      const grd = ctx.createRadialGradient(-30, -30, 10, 0, 0, planetR);
+      grd.addColorStop(0, "#ff6a4a");
+      grd.addColorStop(0.3, "#cc2200");
+      grd.addColorStop(0.7, "#8b0000");
+      grd.addColorStop(1, "#3a0000");
+      ctx.beginPath();
+      ctx.arc(0, 0, planetR, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.shadowColor = "#ff3300";
+      ctx.shadowBlur = 40;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // خطوط سطح الكوكب
+      for (let i = 0; i < 5; i++) {
+        const yOffset = -60 + i * 28;
+        const halfW = Math.sqrt(Math.max(0, planetR * planetR - yOffset * yOffset)) * 0.9;
+        ctx.beginPath();
+        ctx.ellipse(0, yOffset, halfW, 5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,0,0,${0.08 + i * 0.04})`;
+        ctx.fill();
+      }
+
+      // الجزء الأمامي من الحلقات (فوق الكوكب)
+      rings.forEach(ring => {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ring.radiusX, ring.radiusY, 0, 0, Math.PI);
+        ctx.strokeStyle = `rgba(220,80,60,${ring.alpha})`;
+        ctx.lineWidth = ring.width;
+        ctx.stroke();
+      });
+
+      ctx.restore();
+
+      angle += 0.008;
+      requestAnimationFrame(draw);
+    }
+
+    let animFrame = requestAnimationFrame(draw);
+
+    setTimeout(() => {
+      cancelAnimationFrame(animFrame);
+      const intro = document.getElementById("galaxy-intro");
+      intro.style.transition = "opacity 0.8s ease";
+      intro.style.opacity = "0";
+      setTimeout(() => {
+        intro.style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      }, 800);
+    }, 4000);
+  </script>
+</body>
+</html>
